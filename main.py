@@ -1,11 +1,16 @@
 import RPi.GPIO as GPIO
 from time import sleep
+import statistics
 
 counter = 10
 
 Enc_A = 17
 Enc_B = 27
 
+global counters
+counters = []
+global stdev 
+stdev = []
 
 def init():
     print("Rotary Encoder Test Program")
@@ -19,10 +24,15 @@ def init():
 
 def rotation_decode(Enc_A):
     global counter
+
+
     sleep(0.0002)
     Switch_A = GPIO.input(Enc_A)
     Switch_B = GPIO.input(Enc_B)
 
+    if len(counters) >= 2:
+        stdev.append(statistics.stdev(counters))
+    counters.append(counter)
     if (Switch_A == 1) and (Switch_B == 0):
         counter += 1
         print("direction -> ", counter)
@@ -50,6 +60,8 @@ def main():
 
     except KeyboardInterrupt:
         GPIO.cleanup()
+
+
 
 
 if __name__ == '__main__':
